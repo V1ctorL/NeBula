@@ -7,6 +7,8 @@ package team.v1ctorl.nebula.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -55,12 +57,21 @@ public class UserRegisterServlet extends HttpServlet {
         String username = new String(request.getParameter("username").getBytes("ISO8859-1"), "UTF-8"); // handle Chinese
         String password = request.getParameter("password");
         
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        
-        dbUtil.executeUpdate("INSERT INTO users (username, password) VALUES ('" + username + "', '" + hashedPassword + "');");
-        
         PrintWriter out = response.getWriter();
-        out.println("User " + username + " has successfully registered.");
+        
+        ResultSet rs = dbUtil.executeQuery("SELECT * FROM users WHERE username='" + username + "';");
+        try {
+            if (rs.next()) {
+                out.println("This user name has already been registered, please select another name.");
+            }
+            else {
+                String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+                dbUtil.executeUpdate("INSERT INTO users (username, password) VALUES ('" + username + "', '" + hashedPassword + "');");
+                out.println("User " + username + " is successfully registered.");
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Met SQLException while checking username that already exists.");
+        }
     }
 
     @Override
