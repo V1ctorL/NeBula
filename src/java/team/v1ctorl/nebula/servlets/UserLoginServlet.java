@@ -61,8 +61,7 @@ public class UserLoginServlet extends HttpServlet {
         
         ResultSet rs = dbUtil.executeQuery("SELECT password FROM users WHERE username='" + username + "';");
         try {
-            rs.next();
-            if (BCrypt.checkpw(password, rs.getString("password"))) {
+            if (rs.next() && BCrypt.checkpw(password, rs.getString("password"))) {
                 out.println("approved");
             }
             else {
