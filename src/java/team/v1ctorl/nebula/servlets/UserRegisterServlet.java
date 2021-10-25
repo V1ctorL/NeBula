@@ -67,6 +67,7 @@ public class UserRegisterServlet extends HttpServlet {
             else {
                 String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 dbUtil.executeUpdate("INSERT INTO users (username, password) VALUES ('" + username + "', '" + hashedPassword + "');");
+                response.setStatus(HttpServletResponse.SC_CREATED);
                 out.println("User " + username + " is successfully registered.");
             }
         } catch (SQLException ex) {
