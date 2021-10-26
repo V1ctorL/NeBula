@@ -5,10 +5,13 @@
  */
 package team.v1ctorl.nebula.servlets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -16,6 +19,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import team.v1ctorl.nebula.models.Product;
 import team.v1ctorl.nebula.utils.DbUtil;
 
 /**
@@ -53,8 +57,19 @@ public class ProductServlet extends HttpServlet {
             ResultSet rs = dbUtil.executeQuery("SELECT * FROM products WHERE id=" + splitedURI[3]);
             try {
                 if (rs.next()) {
-                    // The requested product is found.
-                    out.println("found the product");  // TODO: use Jackson to handle json
+                    // Load data from ResultSet to a Java object.
+                    Product product = new Product();
+                    product.setId(rs.getInt("id"));
+                    product.setName(rs.getString("name"));
+                    product.setPrice(rs.getFloat("price"));
+                    product.setDescription(rs.getString("description"));
+                    
+                    // Do serialization.
+                    ObjectMapper objectMapper =  new ObjectMapper();
+                    String json = objectMapper.writeValueAsString(product);
+                    
+                    // Return response.
+                    out.println(json);
                 }
                 else {
                     // The requested product is not found.
@@ -66,7 +81,29 @@ public class ProductServlet extends HttpServlet {
         }
         else {
             // The request is not asking for a specific product, return the list of all products.
-            out.println("list");  // TODO: use Jackson to handle json
+            ResultSet rs = dbUtil.executeQuery("SELECT * FROM products;");
+            List<Product> products = new ArrayList<>();
+            try {
+                while (rs.next()) {
+                    // Load data from ResultSet to a Java object.
+                    Product product = new Product();
+                    product.setId(rs.getInt("id"));
+                    product.setName(rs.getString("name"));
+                    product.setPrice(rs.getFloat("price"));
+                    product.setDescription(rs.getString("description"));
+                    
+                    products.add(product);
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Met SQLException while loading all products.");
+            }
+            
+            // Do serialization.
+            ObjectMapper objectMapper =  new ObjectMapper();
+            String json = objectMapper.writeValueAsString(products);
+
+            // Return response.
+            out.println(json);
         }
     }
 
