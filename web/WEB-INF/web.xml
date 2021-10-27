@@ -16,6 +16,10 @@
         <servlet-name>ProductServlet</servlet-name>
         <servlet-class>team.v1ctorl.nebula.servlets.ProductServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserLogoutServlet</servlet-name>
+        <servlet-class>team.v1ctorl.nebula.servlets.UserLogoutServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>ProductServlet</servlet-name>
         <url-pattern>/ProductServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserLogoutServlet</servlet-name>
+        <url-pattern>/UserLogoutServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
