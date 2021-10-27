@@ -41,7 +41,6 @@ public class UserRegisterServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO: return register html page
     }
 
     /**
