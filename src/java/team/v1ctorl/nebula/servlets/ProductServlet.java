@@ -118,9 +118,31 @@ public class ProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String name = request.getParameter("name");
-        String price = request.getParameter("price");
-        String description = request.getParameter("description");  // The maximum length of a String object and that of TEXT in MySQL are equal, which is 65535.
+        String name;
+        String price;
+        String description;
+        
+        String contentType = request.getContentType();
+        if (contentType.equals("application/json")) {
+            String json = request.getReader().readLine();
+            
+            // Deserialization
+            ObjectMapper objectMapper = new ObjectMapper();
+            Product product = objectMapper.readValue(json, Product.class);
+            
+            name = product.getName();
+            price = String.valueOf(product.getPrice());
+            description = product.getDescription();
+        }
+        else if (contentType.equals("application/x-www-form-urlencoded")) {
+            name = request.getParameter("name");
+            price = request.getParameter("price");
+            description = request.getParameter("description");  // The maximum length of a String object and that of TEXT in MySQL are equal, which is 65535.
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            return;
+        }
         
         PrintWriter out = response.getWriter();
         
