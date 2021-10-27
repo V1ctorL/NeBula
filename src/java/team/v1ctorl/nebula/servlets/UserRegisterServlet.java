@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import team.v1ctorl.nebula.utils.BCrypt;
 import team.v1ctorl.nebula.utils.DbUtil;
 
@@ -53,10 +54,17 @@ public class UserRegisterServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        HttpSession session = request.getSession(false);
+        
+        // Check whether the user has logged in or not.
+        if (session!=null && session.getAttribute("id")!=null) {
+            out.println("User has logged in.");
+            return;
+        }
+        
         String username = new String(request.getParameter("username").getBytes("ISO8859-1"), "UTF-8"); // handle Chinese
         String password = request.getParameter("password");
-        
-        PrintWriter out = response.getWriter();
         
         ResultSet rs = dbUtil.executeQuery("SELECT * FROM users WHERE username='" + username + "';");
         try {
@@ -66,6 +74,13 @@ public class UserRegisterServlet extends HttpServlet {
             else {
                 String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                 dbUtil.executeUpdate("INSERT INTO users (username, password) VALUES ('" + username + "', '" + hashedPassword + "');");
+                
+                // Make user log in after registered.
+                rs = dbUtil.executeQuery("SELECT id FROM users WHERE username='" + username + "';");
+                rs.next();
+                session = request.getSession();
+                session.setAttribute("id", rs.getString("id"));
+                
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 out.println("User " + username + " is successfully registered.");
             }
