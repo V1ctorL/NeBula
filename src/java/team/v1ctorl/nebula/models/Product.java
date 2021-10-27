@@ -10,16 +10,16 @@ package team.v1ctorl.nebula.models;
  * @author asus
  */
 public class Product {
-    private int id;
+    private Integer id;
     private String name;
-    private float price;
+    private Float price;
     private String description;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -31,11 +31,11 @@ public class Product {
         this.name = name;
     }
 
-    public float getPrice() {
+    public Float getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(Float price) {
         this.price = price;
     }
 

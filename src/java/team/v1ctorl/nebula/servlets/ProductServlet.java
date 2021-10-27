@@ -6,7 +6,9 @@
 package team.v1ctorl.nebula.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -160,8 +162,68 @@ public class ProductServlet extends HttpServlet {
             dbUtil.executeUpdate(sb.toString());
         }
         response.setStatus(HttpServletResponse.SC_CREATED);
+    }
+
+    /**
+     * Handles the HTTP <code>PUT</code> method.
+     * 
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        String [] splitedURI = requestURI.split("/");
         
-        // TODO: update resource
+        PrintWriter out = response.getWriter();
+        
+        if (splitedURI.length > 3) {
+            // The request is trying to delete a specific product, search for it in the database.
+            ResultSet rs = dbUtil.executeQuery("SELECT * FROM products WHERE id=" + splitedURI[3]);
+            try {
+                if (rs.next()) {  // The requested product is found.
+                    String json = request.getReader().readLine();
+
+                    // Deserialization.
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    Product product = objectMapper.readValue(json, Product.class);
+                    
+                    String name = product.getName();
+                    Float price = product.getPrice();
+                    String description = product.getDescription();
+                    
+                    // Handle condition that no data is provided
+                    if (name==null && price==null && description==null) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        return;
+                    }
+                    
+                    // Update data in the database.
+                    StringBuffer sb = new StringBuffer();
+                    sb.append("UPDATE products SET ");
+                    if (name != null)
+                        sb.append("name='").append(name).append("', ");
+                    if (price != null)
+                        sb.append("price=").append(price).append(", ");
+                    if (description != null)
+                        sb.append("description='").append(description.replaceAll("'", "''")).append("', ");  // Handle single quotation marks
+                    sb.delete(sb.length()-2, sb.length()).append(" WHERE id=" + splitedURI[3]);
+                    
+                    dbUtil.executeUpdate(sb.toString());
+                }
+                else {  // The requested product is not found.
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Met SQLException while updating a product.");
+            }
+        }
+        else {
+            response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        }
     }
 
     /**
