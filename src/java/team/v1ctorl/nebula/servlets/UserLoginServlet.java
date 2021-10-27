@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import team.v1ctorl.nebula.utils.BCrypt;
 import team.v1ctorl.nebula.utils.DbUtil;
 
@@ -53,14 +54,24 @@ public class UserLoginServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        HttpSession session = request.getSession(false);
+        
+        // Check whether the user has logged in or not.
+        if (session!=null && session.getAttribute("id")!=null) {
+            out.println("approved");
+            return;
+        }
+        
         String username = new String(request.getParameter("username").getBytes("ISO8859-1"), "UTF-8"); // handle Chinese
         String password = request.getParameter("password");
         
-        PrintWriter out = response.getWriter();
-        
-        ResultSet rs = dbUtil.executeQuery("SELECT password FROM users WHERE username='" + username + "';");
+        ResultSet rs = dbUtil.executeQuery("SELECT id, password FROM users WHERE username='" + username + "';");
         try {
             if (rs.next() && BCrypt.checkpw(password, rs.getString("password"))) {
+                session = request.getSession();
+                session.setAttribute("id", rs.getString("id"));
+                
                 out.println("approved");
             }
             else {
