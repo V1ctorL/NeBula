@@ -13,6 +13,7 @@ public class Product {
     private Integer id;
     private String name;
     private Float price;
+    private Integer amountOfStock;
     private String description;
 
     public Integer getId() {
@@ -37,6 +38,14 @@ public class Product {
 
     public void setPrice(Float price) {
         this.price = price;
+    }
+
+    public Integer getAmountOfStock() {
+        return amountOfStock;
+    }
+
+    public void setAmountOfStock(Integer amountOfStock) {
+        this.amountOfStock = amountOfStock;
     }
 
     public String getDescription() {

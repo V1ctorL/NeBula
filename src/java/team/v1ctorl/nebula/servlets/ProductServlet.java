@@ -59,6 +59,7 @@ public class ProductServlet extends HttpServlet {
                     product.setId(rs.getInt("id"));
                     product.setName(rs.getString("name"));
                     product.setPrice(rs.getFloat("price"));
+                    product.setAmountOfStock(rs.getInt("amount_of_stock"));
                     product.setDescription(rs.getString("description"));
                     
                     // Do serialization.
@@ -87,6 +88,7 @@ public class ProductServlet extends HttpServlet {
                     product.setId(rs.getInt("id"));
                     product.setName(rs.getString("name"));
                     product.setPrice(rs.getFloat("price"));
+                    product.setAmountOfStock(rs.getInt("amount_of_stock"));
                     product.setDescription(rs.getString("description"));
                     
                     products.add(product);
@@ -116,7 +118,8 @@ public class ProductServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String name;
-        String price;
+        Float price;
+        Integer amountOfStock;
         String description;
         
         String contentType = request.getContentType();
@@ -128,12 +131,14 @@ public class ProductServlet extends HttpServlet {
             Product product = objectMapper.readValue(json, Product.class);
             
             name = product.getName();
-            price = String.valueOf(product.getPrice());
+            price = product.getPrice();
+            amountOfStock = product.getAmountOfStock();
             description = product.getDescription();
         }
         else if (contentType.equals("application/x-www-form-urlencoded")) {
             name = request.getParameter("name");
-            price = request.getParameter("price");
+            price = Float.valueOf(request.getParameter("price"));
+            amountOfStock = Integer.valueOf(request.getParameter("amountOfStock"));
             description = request.getParameter("description");  // The maximum length of a String object and that of TEXT in MySQL are equal, which is 65535.
         }
         else {
@@ -144,16 +149,28 @@ public class ProductServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         if (description == null) {
-            dbUtil.executeUpdate("INSERT INTO products (name, price) VALUES ('" + name + "', " + price + ");");
+            if (amountOfStock == null) 
+                dbUtil.executeUpdate("INSERT INTO products (name, price) VALUES ('" + name + "', " + price + ");");
+            else
+                dbUtil.executeUpdate("INSERT INTO products (name, price, amount_of_stock) VALUES ('" + name + "', " + price + ", " + amountOfStock + ");");
         }
         else {
             StringBuffer sb = new StringBuffer();  // StringBuffer is thread-safe, though StringBuilder is faster.
-            sb
-                    .append("INSERT INTO products (name, price, description) VALUES ('")
-                    .append(name).append("', ")
-                    .append(price).append(", '")
-                    .append(description.replaceAll("'", "''"))  // Handle single quotation marks
-                    .append("');");
+            if (amountOfStock == null)
+                sb
+                        .append("INSERT INTO products (name, price, description) VALUES ('")
+                        .append(name).append("', ")
+                        .append(price).append(", '")
+                        .append(description.replaceAll("'", "''"))  // Handle single quotation marks
+                        .append("');");
+            else
+                sb
+                        .append("INSERT INTO products (name, price, amount_of_stock, description) VALUES ('")
+                        .append(name).append("', ")
+                        .append(price).append(", ")
+                        .append(amountOfStock).append(", '")
+                        .append(description.replaceAll("'", "''"))  // Handle single quotation marks
+                        .append("');");
             dbUtil.executeUpdate(sb.toString());
         }
         response.setStatus(HttpServletResponse.SC_CREATED);
@@ -188,10 +205,11 @@ public class ProductServlet extends HttpServlet {
                     
                     String name = product.getName();
                     Float price = product.getPrice();
+                    Integer amountOfStock = product.getAmountOfStock();
                     String description = product.getDescription();
                     
                     // Handle condition that no data is provided
-                    if (name==null && price==null && description==null) {
+                    if (name==null && price==null && amountOfStock==null && description==null) {
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         return;
                     }
@@ -203,6 +221,8 @@ public class ProductServlet extends HttpServlet {
                         sb.append("name='").append(name).append("', ");
                     if (price != null)
                         sb.append("price=").append(price).append(", ");
+                    if (amountOfStock != null)
+                        sb.append("amount_of_stock=").append(amountOfStock).append(", ");
                     if (description != null)
                         sb.append("description='").append(description.replaceAll("'", "''")).append("', ");  // Handle single quotation marks
                     sb.delete(sb.length()-2, sb.length()).append(" WHERE id=" + splitedURI[3]);
