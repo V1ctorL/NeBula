@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Reference: https://github.com/twitter-archive/snowflake/blob/snowflake-2010/src/main/scala/com/twitter/service/snowflake/IdWorker.scala (Copyright 2010-2012 Twitter, Inc.)
  */
 package team.v1ctorl.nebula.utils;
 
@@ -46,6 +44,10 @@ public class SnowFlake {
         
         // System.out.format("worker starting. timestamp left shift %d, datacenter id bits %d, worker id bits %d, sequence bits %d, workerid %d", timestampLeftShift, datacenterIdBits, workerIdBits, sequenceBits, workerId);
         Logger.getLogger(SnowFlake.class.getName()).log(Level.INFO, String.format("worker starting. timestamp left shift %d, datacenter id bits %d, worker id bits %d, sequence bits %d, workerid %d", timestampLeftShift, datacenterIdBits, workerIdBits, sequenceBits, workerId));
+    }
+
+    public long getLastTimestamp() {
+        return lastTimestamp;
     }
     
     public synchronized long nextId() {
