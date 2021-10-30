@@ -11,4 +11,12 @@ package team.v1ctorl.nebula;
  */
 public class Settings {
     public static final boolean DEVELOPER_MODE = false;
+    
+    public class Datebase {
+        public static final String DRIVER = "com.mysql.cj.jdbc.Driver";
+        public static final String HOST = "localhost";
+        public static final String NAME = "NeBula";
+        public static final String USER = "root";
+        public static final String PASSWORD = "123456";
+    }
 }
