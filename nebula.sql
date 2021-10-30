@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 30/10/2021 17:07:46
+ Date: 31/10/2021 02:00:00
 */
 
 SET NAMES utf8mb4;
@@ -66,7 +66,8 @@ CREATE TABLE `products_in_the_orders`  (
   `order_id` bigint UNSIGNED NOT NULL,
   `product_id` int UNSIGNED NOT NULL,
   `product_price` float NOT NULL,
-  `product_amount` int UNSIGNED NULL DEFAULT NULL,
+  `product_amount` int UNSIGNED NOT NULL,
+  `is_returned` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`order_id`, `product_id`) USING BTREE,
   INDEX `product_id`(`product_id`) USING BTREE,
   CONSTRAINT `products_in_the_orders_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
