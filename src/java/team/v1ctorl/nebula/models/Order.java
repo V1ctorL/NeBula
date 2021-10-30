@@ -8,7 +8,7 @@ package team.v1ctorl.nebula.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 /**

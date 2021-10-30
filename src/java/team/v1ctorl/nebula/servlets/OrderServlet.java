@@ -116,7 +116,7 @@ public class OrderServlet extends HttpServlet {
                     // Load data from ResultSet to a Java object
                     Order order = new Order();
                     order.setId(rs1.getLong("id"));
-                    order.setDatetime(rs1.getDate("datetime"));
+                    order.setDatetime(rs1.getTimestamp("datetime"));
                     order.setTotalPrice(rs1.getFloat("total_price"));
                     
                     List<ProductInAnOrder> productList = new ArrayList<>();
