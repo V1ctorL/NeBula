@@ -28,6 +28,10 @@
         <servlet-name>OrderServlet</servlet-name>
         <servlet-class>team.v1ctorl.nebula.servlets.OrderServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReturnProductServlet</servlet-name>
+        <servlet-class>team.v1ctorl.nebula.servlets.ReturnProductServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/NewServlet</url-pattern>
@@ -55,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>OrderServlet</servlet-name>
         <url-pattern>/OrderServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReturnProductServlet</servlet-name>
+        <url-pattern>/ReturnProductServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

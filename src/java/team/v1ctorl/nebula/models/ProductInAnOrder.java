@@ -20,6 +20,8 @@ public class ProductInAnOrder {
     private Float productPrice;
     
     private Integer productAmount;
+    
+    private Boolean isReturned;
 
     public Long getOrderID() {
         return orderID;
@@ -51,5 +53,13 @@ public class ProductInAnOrder {
 
     public void setProductAmount(Integer productAmount) {
         this.productAmount = productAmount;
+    }
+
+    public Boolean getIsReturned() {
+        return isReturned;
+    }
+
+    public void setIsReturned(Boolean isReturned) {
+        this.isReturned = isReturned;
     }
 }

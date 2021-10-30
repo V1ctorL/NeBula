@@ -86,6 +86,7 @@ public class OrderServlet extends HttpServlet {
                         product.setProductID(rs2.getInt("product_id"));
                         product.setProductPrice(rs2.getFloat("product_price"));
                         product.setProductAmount(rs2.getInt("product_amount"));
+                        product.setIsReturned(rs2.getBoolean("is_returned"));
                         
                         productList.add(product);
                     }
@@ -126,6 +127,7 @@ public class OrderServlet extends HttpServlet {
                         product.setProductID(rs2.getInt("product_id"));
                         product.setProductPrice(rs2.getFloat("product_price"));
                         product.setProductAmount(rs2.getInt("product_amount"));
+                        product.setIsReturned(rs2.getBoolean("is_returned"));
                         
                         productList.add(product);
                     }
