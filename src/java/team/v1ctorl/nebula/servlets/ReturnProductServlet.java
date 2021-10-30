@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import team.v1ctorl.nebula.Settings;
 import team.v1ctorl.nebula.utils.DbUtil;
 
 /**
@@ -38,6 +39,7 @@ public class ReturnProductServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (Settings.DEVELOPER_MODE) doPost(request, response);
     }
 
     /**
