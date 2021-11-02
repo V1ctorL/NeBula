@@ -8,7 +8,7 @@ package team.v1ctorl.nebula.utils;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import team.v1ctorl.nebula.Settings;
+import team.v1ctorl.nebula.Settings.Datebase;
 import team.v1ctorl.nebula.exceptions.DbUtilException;
 
 /**
@@ -17,12 +17,12 @@ import team.v1ctorl.nebula.exceptions.DbUtilException;
  */
 public class DbUtil {
     // MySQL 8.0 以上版本 - JDBC 驱动名及数据库 URL
-    private static final String JDBC_DRIVER = Settings.Datebase.DRIVER;
-    private static final String DB_URL = "jdbc:mysql://" + Settings.Datebase.HOST + ":3306/" + Settings.Datebase.NAME + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String JDBC_DRIVER = Datebase.DRIVER;
+    private static final String DB_URL = "jdbc:mysql://" + Datebase.HOST + ":3306/" + Datebase.NAME + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
  
     // 数据库的用户名与密码
-    private static final String USER = Settings.Datebase.USER;
-    private static final String PASS = Settings.Datebase.PASSWORD;
+    private static final String USER = Datebase.USER;
+    private static final String PASS = Datebase.PASSWORD;
     
     // 数据库操作相关变量
     private Connection conn;
