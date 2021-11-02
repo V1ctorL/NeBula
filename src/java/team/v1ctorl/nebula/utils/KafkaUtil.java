@@ -25,10 +25,13 @@ import team.v1ctorl.nebula.exceptions.KafkaUtilException;
  */
 public class KafkaUtil {
     
-    public class Producer {
-        org.apache.kafka.clients.producer.Producer<String, String> producer;
+    public static class Producer {
+        private org.apache.kafka.clients.producer.Producer<String, String> producer;
+        
+        // The instance is declared volatile so that double check lock would work correctly.
+        private static volatile Producer instance;
 
-        public Producer() {
+        private Producer() {
             Properties props = new Properties();
             props.put("bootstrap.servers", Kafka.BOOTSTRAP_SERVERS);
             props.put("acks", Kafka.Producer.ACKS);
@@ -40,6 +43,20 @@ public class KafkaUtil {
             props.put("value.serializer", Kafka.Producer.VALUE_SERIALIZER);
 
             producer = new KafkaProducer<>(props);
+        }
+        
+        public static Producer getInstance() {
+            // double-checked locking
+            Producer result = instance;
+            if (result != null) {
+                return result;
+            }
+            synchronized(Producer.class) {
+                if (instance == null) {
+                    instance = new Producer();
+                }
+                return instance;
+            }
         }
         
         public void send(String topic, String key, String value) {
@@ -58,10 +75,13 @@ public class KafkaUtil {
         
     }
     
-    public class Consumer {
-        KafkaConsumer<String, String> consumer;
+    public static class Consumer {
+        private KafkaConsumer<String, String> consumer;
+        
+        // The instance is declared volatile so that double check lock would work correctly.
+        private static volatile Consumer instance;
 
-        public Consumer() {
+        private Consumer() {
             Properties props = new Properties();
             props.put("bootstrap.servers", Kafka.BOOTSTRAP_SERVERS);
             props.put("group.id", Kafka.Consumer.GROUP_ID);
@@ -72,6 +92,20 @@ public class KafkaUtil {
             props.put("value.deserializer", Kafka.Consumer.VALUE_DESERIALIZER);
             
             consumer = new KafkaConsumer(props);
+        }
+        
+        public static Consumer getInstance() {
+            // double-checked locking
+            Consumer result = instance;
+            if (result != null) {
+                return result;
+            }
+            synchronized (Consumer.class) {
+                if (instance == null) {
+                    instance = new Consumer();
+                }
+                return instance;
+            }
         }
         
         public void subscribe(Collection<String> topics) {
@@ -88,7 +122,7 @@ public class KafkaUtil {
         
     }
     
-    public void handleException(Exception ex, String exceptionInformation) {
+    public static void handleException(Exception ex, String exceptionInformation) {
         Logger.getLogger(KafkaUtil.class.getName()).log(Level.SEVERE, null, ex);
         throw new KafkaUtilException(exceptionInformation, ex);
     }
