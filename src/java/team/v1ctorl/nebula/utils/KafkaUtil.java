@@ -16,6 +16,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import team.v1ctorl.nebula.Settings.Kafka;
 import team.v1ctorl.nebula.exceptions.KafkaUtilException;
 
 /**
@@ -29,14 +30,14 @@ public class KafkaUtil {
 
         public Producer() {
             Properties props = new Properties();
-            props.put("bootstrap.servers", "192.168.137.108:9092");
-            props.put("acks", "all");
-            props.put("retries", 0);
-            props.put("batch.size", 16384);
-            props.put("linger.ms", 1);
-            props.put("buffer.memory", 33554432);
-            props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+            props.put("bootstrap.servers", Kafka.BOOTSTRAP_SERVERS);
+            props.put("acks", Kafka.Producer.ACKS);
+            props.put("retries", Kafka.Producer.RETRIES);
+            props.put("batch.size", Kafka.Producer.BATCH_SIZE);
+            props.put("linger.ms", Kafka.Producer.LINGER_MS);
+            props.put("buffer.memory", Kafka.Producer.BUFFER_MEMORY);
+            props.put("key.serializer", Kafka.Producer.KEY_SERIALIZER);
+            props.put("value.serializer", Kafka.Producer.VALUE_SERIALIZER);
 
             producer = new KafkaProducer<>(props);
         }
@@ -62,13 +63,13 @@ public class KafkaUtil {
 
         public Consumer() {
             Properties props = new Properties();
-            props.put("bootstrap.servers", "192.168.137.108:9092");
-            props.put("group.id", "1");
-            props.put("enable.auto.commit", "true");
-            props.put("auto.offset.reset", "earliest");
-            props.put("auto.commit.interval.ms", "1000");
-            props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-            props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+            props.put("bootstrap.servers", Kafka.BOOTSTRAP_SERVERS);
+            props.put("group.id", Kafka.Consumer.GROUP_ID);
+            props.put("enable.auto.commit", Kafka.Consumer.ENABLE_AUTO_COMMIT);
+            props.put("auto.offset.reset", Kafka.Consumer.AUTO_OFFSET_RESET);
+            props.put("auto.commit.interval.ms", Kafka.Consumer.AUTO_COMMIT_INTERVAL_MS);
+            props.put("key.deserializer", Kafka.Consumer.KEY_DESERIALIZER);
+            props.put("value.deserializer", Kafka.Consumer.VALUE_DESERIALIZER);
             
             consumer = new KafkaConsumer(props);
         }
