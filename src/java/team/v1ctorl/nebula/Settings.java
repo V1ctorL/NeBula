@@ -23,7 +23,7 @@ public class Settings {
     public class Kafka {
         public static final boolean ENABLE_KAFKA = true;
         
-        public static final String BOOTSTRAP_SERVERS = "192.168.137.190:9092";
+        public static final String BOOTSTRAP_SERVERS = "192.168.137.117:9092";
         
         public class Producer {
             public static final String ACKS                     =   "all";
@@ -36,12 +36,13 @@ public class Settings {
         }
         
         public class Consumer {
-            public static final String GROUP_ID                 =   "2";
+            public static final String GROUP_ID                 =   "1";
             public static final String ENABLE_AUTO_COMMIT       =   "true";
             public static final String AUTO_OFFSET_RESET        =   "earliest";
             public static final String AUTO_COMMIT_INTERVAL_MS  =   "1000";
             public static final String KEY_DESERIALIZER         =   "org.apache.kafka.common.serialization.StringDeserializer";
             public static final String VALUE_DESERIALIZER       =   "org.apache.kafka.common.serialization.StringDeserializer";
+            public static final long POLL_TIMEOUT               =   200;
         }
     }
 }

@@ -113,7 +113,11 @@ public class KafkaUtil {
         }
         
         public ConsumerRecords<String, String> poll() {
-            return consumer.poll(200);
+            return poll(Kafka.Consumer.POLL_TIMEOUT);
+        }
+        
+        public ConsumerRecords<String, String> poll(long timeout) {
+            return consumer.poll(timeout);
         }
         
         public void close() {
