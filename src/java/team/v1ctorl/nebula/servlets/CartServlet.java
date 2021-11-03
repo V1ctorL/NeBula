@@ -66,13 +66,14 @@ public class CartServlet extends HttpServlet {
                 cart.setProductID(rs.getInt("product_id"));
                 cart.setAmount(rs.getInt("amount"));
                 
-                // Serialize
-                ObjectMapper objectMapper = new ObjectMapper();
-                String json = objectMapper.writeValueAsString(cart);
-                
-                // Return response
-                response.getWriter().println(json);
+                cartList.add(cart);
             }
+            // Serialize
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(cartList);
+
+            // Return response
+            response.getWriter().println(json);
         } catch (SQLException ex) {
             Logger.getLogger(CartServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
