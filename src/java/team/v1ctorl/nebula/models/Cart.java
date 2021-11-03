@@ -10,23 +10,23 @@ package team.v1ctorl.nebula.models;
  * @author asus
  */
 public class Cart {
-    private Integer userID;
-    private Integer productID;
+    private Long userID;
+    private Long productID;
     private Integer amount;
 
-    public Integer getUserID() {
+    public Long getUserID() {
         return userID;
     }
 
-    public void setUserID(Integer userID) {
+    public void setUserID(Long userID) {
         this.userID = userID;
     }
 
-    public Integer getProductID() {
+    public Long getProductID() {
         return productID;
     }
 
-    public void setProductID(Integer productID) {
+    public void setProductID(Long productID) {
         this.productID = productID;
     }
 

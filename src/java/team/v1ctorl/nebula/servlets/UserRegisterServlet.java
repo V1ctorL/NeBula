@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import team.v1ctorl.nebula.Settings;
 import team.v1ctorl.nebula.utils.BCrypt;
 import team.v1ctorl.nebula.utils.DbUtil;
+import team.v1ctorl.nebula.utils.SnowFlake;
 
 /**
  *
@@ -26,10 +27,12 @@ import team.v1ctorl.nebula.utils.DbUtil;
 @WebServlet("/register")
 public class UserRegisterServlet extends HttpServlet {
     DbUtil dbUtil;
+    SnowFlake snowFlake;
 
     @Override
     public void init() throws ServletException {
         dbUtil = new DbUtil();
+        snowFlake = new SnowFlake(0, 0);
     }
 
     /**
@@ -73,14 +76,18 @@ public class UserRegisterServlet extends HttpServlet {
                 out.println("This user name has already been registered, please select another name.");
             }
             else {
+                // Generate an ID
+                long userID = snowFlake.nextId();
+                
+                // Encrypt the password
                 String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-                dbUtil.executeUpdate("INSERT INTO users (username, password) VALUES ('" + username + "', '" + hashedPassword + "');");
+                
+                // Create a new record in the datebase
+                dbUtil.executeUpdate("INSERT INTO users VALUES (" + userID + ", '" + username + "', '" + hashedPassword + "');");
                 
                 // Make user log in after registered.
-                rs = dbUtil.executeQuery("SELECT id FROM users WHERE username='" + username + "';");
-                rs.next();
                 session = request.getSession();
-                session.setAttribute("id", rs.getString("id"));
+                session.setAttribute("id", userID);
                 
                 response.setStatus(HttpServletResponse.SC_CREATED);
                 out.println("User " + username + " is successfully registered.");

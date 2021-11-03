@@ -13,8 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -83,7 +81,7 @@ public class OrderServlet extends HttpServlet {
                     ResultSet rs2 = dbUtil.executeQuery("SELECT * FROM products_in_the_orders WHERE order_id=" + splitedURI[3]);
                     while (rs2.next()) {
                         ProductInAnOrder product = new ProductInAnOrder();
-                        product.setProductID(rs2.getInt("product_id"));
+                        product.setProductID(rs2.getLong("product_id"));
                         product.setProductPrice(rs2.getFloat("product_price"));
                         product.setProductAmount(rs2.getInt("product_amount"));
                         product.setIsReturned(rs2.getBoolean("is_returned"));
@@ -124,7 +122,7 @@ public class OrderServlet extends HttpServlet {
                     ResultSet rs2 = dbUtil2.executeQuery("SELECT * FROM products_in_the_orders WHERE order_id=" + order.getId());
                     while (rs2.next()) {
                         ProductInAnOrder product = new ProductInAnOrder();
-                        product.setProductID(rs2.getInt("product_id"));
+                        product.setProductID(rs2.getLong("product_id"));
                         product.setProductPrice(rs2.getFloat("product_price"));
                         product.setProductAmount(rs2.getInt("product_amount"));
                         product.setIsReturned(rs2.getBoolean("is_returned"));
@@ -202,7 +200,7 @@ public class OrderServlet extends HttpServlet {
                     + orderID + ", "
                     + product.getProductID() + ", "
                     + product.getProductPrice() + ", "
-                    + product.getProductAmount() + ");"
+                    + product.getProductAmount() + ", false);"
             );
             totalPrice += product.getProductPrice() * product.getProductAmount();
         }

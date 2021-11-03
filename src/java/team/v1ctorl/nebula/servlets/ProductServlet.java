@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import team.v1ctorl.nebula.models.Product;
 import team.v1ctorl.nebula.utils.DbUtil;
+import team.v1ctorl.nebula.utils.SnowFlake;
 
 /**
  *
@@ -27,10 +28,12 @@ import team.v1ctorl.nebula.utils.DbUtil;
 @WebServlet("/product/*")
 public class ProductServlet extends HttpServlet {
     DbUtil dbUtil;
+    SnowFlake snowFlake;
 
     @Override
     public void init() throws ServletException {
         dbUtil = new DbUtil();
+        snowFlake = new SnowFlake(0, 0);
     }
 
     /**
@@ -56,7 +59,7 @@ public class ProductServlet extends HttpServlet {
                 if (rs.next()) {
                     // Load data from ResultSet to a Java object.
                     Product product = new Product();
-                    product.setId(rs.getInt("id"));
+                    product.setId(rs.getLong("id"));
                     product.setName(rs.getString("name"));
                     product.setPrice(rs.getFloat("price"));
                     product.setAmountOfStock(rs.getInt("amount_of_stock"));
@@ -85,7 +88,7 @@ public class ProductServlet extends HttpServlet {
                 while (rs.next()) {
                     // Load data from ResultSet to a Java object.
                     Product product = new Product();
-                    product.setId(rs.getInt("id"));
+                    product.setId(rs.getLong("id"));
                     product.setName(rs.getString("name"));
                     product.setPrice(rs.getFloat("price"));
                     product.setAmountOfStock(rs.getInt("amount_of_stock"));
@@ -117,6 +120,7 @@ public class ProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        Long id;
         String name;
         Float price;
         Integer amountOfStock;
@@ -148,24 +152,29 @@ public class ProductServlet extends HttpServlet {
         
         PrintWriter out = response.getWriter();
         
+        // Generate an ID
+        id = snowFlake.nextId();
+        
         if (description == null) {
             if (amountOfStock == null) 
-                dbUtil.executeUpdate("INSERT INTO products (name, price) VALUES ('" + name + "', " + price + ");");
+                dbUtil.executeUpdate("INSERT INTO products (id, name, price) VALUES (" + id + ", '" + name + "', " + price + ");");
             else
-                dbUtil.executeUpdate("INSERT INTO products (name, price, amount_of_stock) VALUES ('" + name + "', " + price + ", " + amountOfStock + ");");
+                dbUtil.executeUpdate("INSERT INTO products (id, name, price, amount_of_stock) VALUES (" + id + ", '" + name + "', " + price + ", " + amountOfStock + ");");
         }
         else {
             StringBuffer sb = new StringBuffer();  // StringBuffer is thread-safe, though StringBuilder is faster.
             if (amountOfStock == null)
                 sb
-                        .append("INSERT INTO products (name, price, description) VALUES ('")
+                        .append("INSERT INTO products (id, name, price, description) VALUES (")
+                        .append(id).append(", '")
                         .append(name).append("', ")
                         .append(price).append(", '")
                         .append(description.replaceAll("'", "''"))  // Handle single quotation marks
                         .append("');");
             else
                 sb
-                        .append("INSERT INTO products (name, price, amount_of_stock, description) VALUES ('")
+                        .append("INSERT INTO products (id, name, price, amount_of_stock, description) VALUES (")
+                        .append(id).append(", '")
                         .append(name).append("', ")
                         .append(price).append(", ")
                         .append(amountOfStock).append(", '")

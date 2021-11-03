@@ -62,8 +62,8 @@ public class CartServlet extends HttpServlet {
             while (rs.next()) {
                 // Load data from ResultSet to a Java object.
                 Cart cart = new Cart();
-                cart.setUserID(Integer.valueOf(userID));
-                cart.setProductID(rs.getInt("product_id"));
+                cart.setUserID(Long.valueOf(userID));
+                cart.setProductID(rs.getLong("product_id"));
                 cart.setAmount(rs.getInt("amount"));
                 
                 cartList.add(cart);
@@ -100,7 +100,7 @@ public class CartServlet extends HttpServlet {
         
         // Load data from the request
         String contentType = request.getContentType();
-        Integer productID;
+        Long productID;
         Integer amount;
         if (contentType.equals("application/json")) {
             String json = request.getReader().readLine();

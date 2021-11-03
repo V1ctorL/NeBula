@@ -10,17 +10,17 @@ package team.v1ctorl.nebula.models;
  * @author asus
  */
 public class Product {
-    private Integer id;
+    private Long id;
     private String name;
     private Float price;
     private Integer amountOfStock;
     private String description;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

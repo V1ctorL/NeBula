@@ -10,15 +10,15 @@ package team.v1ctorl.nebula.models;
  * @author asus
  */
 public class User {
-    private Integer id;
+    private Long id;
     private String username;
     private String password;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

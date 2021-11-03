@@ -22,7 +22,7 @@ public class Order {
     private Date datetime;
     
     @JsonProperty(access = Access.WRITE_ONLY)
-    private Integer userID;
+    private Long userID;
     
     private Float totalPrice;
     
@@ -44,11 +44,11 @@ public class Order {
         this.datetime = datetime;
     }
 
-    public Integer getUserID() {
+    public Long getUserID() {
         return userID;
     }
 
-    public void setUserID(Integer userID) {
+    public void setUserID(Long userID) {
         this.userID = userID;
     }
 

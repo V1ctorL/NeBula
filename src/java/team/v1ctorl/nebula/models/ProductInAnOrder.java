@@ -15,7 +15,7 @@ public class ProductInAnOrder {
     @JsonIgnore
     private Long orderID;
     
-    private Integer productID;
+    private Long productID;
     
     private Float productPrice;
     
@@ -31,11 +31,11 @@ public class ProductInAnOrder {
         this.orderID = orderID;
     }
 
-    public Integer getProductID() {
+    public Long getProductID() {
         return productID;
     }
 
-    public void setProductID(Integer productID) {
+    public void setProductID(Long productID) {
         this.productID = productID;
     }
 
