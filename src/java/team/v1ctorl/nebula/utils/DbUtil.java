@@ -27,12 +27,9 @@ public class DbUtil {
     // 数据库操作相关变量
     private Connection conn;
     private Statement stmt;
+    private PreparedStatement pstmt;
 
     public DbUtil() {
-        this(true);
-    }
-
-    public DbUtil(boolean setAutoCommit) {
         try {
             // 注册 JDBC 驱动
             Class.forName(JDBC_DRIVER);
@@ -40,7 +37,6 @@ public class DbUtil {
             // 打开链接
             System.out.println("Connecting to the database...");
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
-            conn.setAutoCommit(setAutoCommit);
             stmt = conn.createStatement();
             System.out.println("Connected to the database.");
         } catch (SQLException ex) {
@@ -49,13 +45,29 @@ public class DbUtil {
             handleException(ex, "Fail to load jdbc driver.");
         }
     }
-
-    public Connection getConnection() {
-        return conn;
+    
+    public void setAutoCommit(boolean autoCommit) {
+        try {
+            // If set false, a lock will be gotten, which MUST be released by setting it true after commit.
+            conn.setAutoCommit(autoCommit);
+            stmt = conn.createStatement();
+        } catch (SQLException ex) {
+            handleException(ex, "Met exception while setting auto commit.");
+        }
     }
 
-    public Statement getStatement() {
-        return stmt;
+    public void setPreparedStatement(PreparedStatement pstmt) {
+        this.pstmt = pstmt;
+    }
+    
+    public PreparedStatement prepareStatement(String sql) {
+        try {
+            pstmt = conn.prepareStatement(sql);
+            return pstmt;
+        } catch (SQLException ex) {
+            handleException(ex, "Met exception while preparing statement.");
+            return null;
+        }
     }
     
     public ResultSet executeQuery(String sql) {
@@ -67,18 +79,27 @@ public class DbUtil {
         }
     }
     
-    public void executeUpdate(String sql) {
+    public int executeUpdate(String sql) {
         try {
-            stmt.executeUpdate(sql);
+            return stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             handleException(ex, "Met exception while executing update.");
+            return -1;
+        }
+    }
+    
+    public int executeUpdate() {
+        try {
+            return pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            handleException(ex, "Met exception while executing update.");
+            return -1;
         }
     }
     
     public void commit() {
         try {
-            if (conn.getAutoCommit())
-                conn.commit();
+            conn.commit();
         } catch (SQLException ex) {
             try {
                 conn.rollback();
@@ -86,11 +107,15 @@ public class DbUtil {
                 handleException(ex, "Met exception while rolling back.");
             }
             handleException(ex, "Met exception while committing.");
+        } finally {
+            this.setAutoCommit(false);
         }
     }
     
     public void close() {
         try {
+            if (!conn.getAutoCommit()) this.commit();
+            if (pstmt != null) pstmt.close();
             stmt.close();
             conn.close();
         } catch (SQLException ex) {

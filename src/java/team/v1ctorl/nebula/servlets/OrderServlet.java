@@ -7,6 +7,7 @@ package team.v1ctorl.nebula.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -30,14 +31,12 @@ import team.v1ctorl.nebula.utils.SnowFlake;
  */
 @WebServlet("/order/*")
 public class OrderServlet extends HttpServlet {
-    DbUtil dbUtilAutoTransaction;
-    DbUtil dbUtilManualTransaction;
+    DbUtil dbUtil;
     SnowFlake snowFlake;
 
     @Override
     public void init() throws ServletException {
-        dbUtilAutoTransaction = new DbUtil();
-        dbUtilManualTransaction = new DbUtil(false);
+        dbUtil = new DbUtil();
         snowFlake = new SnowFlake(0, 0);
     }
     
@@ -68,7 +67,7 @@ public class OrderServlet extends HttpServlet {
         
         if (splitedURI.length > 3) {
             // The request is asking for a specific order, search for it in the database
-            ResultSet rs1 = dbUtilAutoTransaction.executeQuery("SELECT * FROM "
+            ResultSet rs1 = dbUtil.executeQuery("SELECT * FROM "
                     + "(SELECT * FROM orders WHERE user_id=" + userID + ") AS orders"
                     + " WHERE id=" + splitedURI[3]);
             try {
@@ -80,7 +79,7 @@ public class OrderServlet extends HttpServlet {
                     order.setTotalPrice(rs1.getFloat("total_price"));
                     
                     List<ProductInAnOrder> productList = new ArrayList<>();
-                    ResultSet rs2 = dbUtilAutoTransaction.executeQuery("SELECT * FROM products_in_the_orders WHERE order_id=" + splitedURI[3]);
+                    ResultSet rs2 = dbUtil.executeQuery("SELECT * FROM products_in_the_orders WHERE order_id=" + splitedURI[3]);
                     while (rs2.next()) {
                         ProductInAnOrder product = new ProductInAnOrder();
                         product.setProductID(rs2.getLong("product_id"));
@@ -109,7 +108,7 @@ public class OrderServlet extends HttpServlet {
         }
         else {
             // The request is not asking for a specific order, return the list of all orders of this user
-            ResultSet rs1 = dbUtilAutoTransaction.executeQuery("SELECT * FROM orders WHERE user_id=" + userID);
+            ResultSet rs1 = dbUtil.executeQuery("SELECT * FROM orders WHERE user_id=" + userID);
             List<Order> orderList = new ArrayList<>();
             try {
                 DbUtil dbUtil2 = new DbUtil();
@@ -191,34 +190,45 @@ public class OrderServlet extends HttpServlet {
         // Get the user's ID
         String userID = (String) session.getAttribute("id");
         // Calculate the total price of the order
-        int totalPrice = 0;
+        float totalPrice = 0;
+        
+        // Start a transaction
+        dbUtil.setAutoCommit(false);
         // Insert data into database
-        dbUtilManualTransaction.executeUpdate("INSERT INTO orders (id, datetime, user_id) VALUES (" + orderID + ", '" + date + "', " + userID + ");");
+        dbUtil.executeUpdate("INSERT INTO orders (id, datetime, user_id) VALUES (" + orderID + ", '" + date + "', " + userID + ");");
         // NOTICE: the currently inserted data dose NOT include the total price
         
         // Save the products of this order
+        PreparedStatement pstmt = dbUtil.prepareStatement("INSERT INTO products_in_the_orders VALUES (?, ?, ?, ?, false)");
         for (ProductInAnOrder product: order.getProductList()) {
-            dbUtilManualTransaction.executeUpdate("INSERT INTO products_in_the_orders VALUES ("
-                    + orderID + ", "
-                    + product.getProductID() + ", "
-                    + product.getProductPrice() + ", "
-                    + product.getProductAmount() + ", false);"
-            );
+            try {
+                pstmt.setLong(1, orderID);
+                pstmt.setLong(2, product.getProductID());
+                pstmt.setFloat(3, product.getProductPrice());
+                pstmt.setInt(4, product.getProductAmount());
+            } catch (SQLException ex) {
+                DbUtil.handleException(ex, "Met exception when setting prepared statement.");
+            }
+            System.out.println(pstmt.toString());
+            dbUtil.setPreparedStatement(pstmt);
+            int result = dbUtil.executeUpdate();
+            System.out.println(result);
+            
             totalPrice += product.getProductPrice() * product.getProductAmount();
         }
         
         // Update the total price in the order
-        dbUtilManualTransaction.executeUpdate("UPDATE orders SET total_price=" + totalPrice + " WHERE id=" + orderID);
+        dbUtil.executeUpdate("UPDATE orders SET total_price=" + totalPrice + " WHERE id=" + orderID);
         
-        dbUtilManualTransaction.commit();
+        // Commit changes and end the transaction
+        dbUtil.commit();
         
         response.setStatus(HttpServletResponse.SC_CREATED);
     }
 
     @Override
     public void destroy() {
-        dbUtilAutoTransaction.close();
-        dbUtilManualTransaction.close();
+        dbUtil.close();
     }
 
 }
