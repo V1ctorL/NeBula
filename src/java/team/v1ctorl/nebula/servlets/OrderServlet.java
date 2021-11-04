@@ -209,10 +209,8 @@ public class OrderServlet extends HttpServlet {
             } catch (SQLException ex) {
                 DbUtil.handleException(ex, "Met exception when setting prepared statement.");
             }
-            System.out.println(pstmt.toString());
             dbUtil.setPreparedStatement(pstmt);
-            int result = dbUtil.executeUpdate();
-            System.out.println(result);
+            dbUtil.executeUpdate();
             
             totalPrice += product.getProductPrice() * product.getProductAmount();
         }
