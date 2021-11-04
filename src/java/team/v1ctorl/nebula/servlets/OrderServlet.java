@@ -207,10 +207,23 @@ public class OrderServlet extends HttpServlet {
                 pstmt.setFloat(3, product.getProductPrice());
                 pstmt.setInt(4, product.getProductAmount());
             } catch (SQLException ex) {
-                DbUtil.handleException(ex, "Met exception when setting prepared statement.");
+                throw new RuntimeException(ex);
             }
             dbUtil.setPreparedStatement(pstmt);
             dbUtil.executeUpdate();
+            
+            // Update the amount of stock of the product
+            try {
+                // Get the amount of stock
+                ResultSet rs = dbUtil.executeQuery("SELECT amount_of_stock FROM products WHERE id=" + product.getProductID());
+                rs.next();
+                // Calculate the new amount
+                int newAmount = rs.getInt("amount_of_stock") - product.getProductAmount();
+                // Update the amount of stock
+                dbUtil.executeUpdate("UPDATE products SET amount_of_stock=" + newAmount + " WHERE id=" + product.getProductID());
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             
             totalPrice += product.getProductPrice() * product.getProductAmount();
         }
