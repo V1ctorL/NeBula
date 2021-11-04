@@ -29,6 +29,10 @@ public class DbUtil {
     private Statement stmt;
 
     public DbUtil() {
+        this(true);
+    }
+
+    public DbUtil(boolean setAutoCommit) {
         try {
             // 注册 JDBC 驱动
             Class.forName(JDBC_DRIVER);
@@ -36,6 +40,7 @@ public class DbUtil {
             // 打开链接
             System.out.println("Connecting to the database...");
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            conn.setAutoCommit(setAutoCommit);
             stmt = conn.createStatement();
             System.out.println("Connected to the database.");
         } catch (SQLException ex) {
@@ -70,6 +75,20 @@ public class DbUtil {
         }
     }
     
+    public void commit() {
+        try {
+            if (conn.getAutoCommit())
+                conn.commit();
+        } catch (SQLException ex) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex1) {
+                handleException(ex, "Met exception while rolling back.");
+            }
+            handleException(ex, "Met exception while committing.");
+        }
+    }
+    
     public void close() {
         try {
             stmt.close();
@@ -79,7 +98,7 @@ public class DbUtil {
         }
     }
     
-    public void handleException(Exception ex, String exceptionInformation) {
+    public static void handleException(Exception ex, String exceptionInformation) {
         Logger.getLogger(DbUtil.class.getName()).log(Level.SEVERE, null, ex);
         throw new DbUtilException(exceptionInformation, ex);
     }

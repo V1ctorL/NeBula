@@ -30,12 +30,14 @@ import team.v1ctorl.nebula.utils.SnowFlake;
  */
 @WebServlet("/order/*")
 public class OrderServlet extends HttpServlet {
-    DbUtil dbUtil;
+    DbUtil dbUtilAutoTransaction;
+    DbUtil dbUtilManualTransaction;
     SnowFlake snowFlake;
 
     @Override
     public void init() throws ServletException {
-        dbUtil = new DbUtil();
+        dbUtilAutoTransaction = new DbUtil();
+        dbUtilManualTransaction = new DbUtil(false);
         snowFlake = new SnowFlake(0, 0);
     }
     
@@ -66,7 +68,7 @@ public class OrderServlet extends HttpServlet {
         
         if (splitedURI.length > 3) {
             // The request is asking for a specific order, search for it in the database
-            ResultSet rs1 = dbUtil.executeQuery("SELECT * FROM "
+            ResultSet rs1 = dbUtilAutoTransaction.executeQuery("SELECT * FROM "
                     + "(SELECT * FROM orders WHERE user_id=" + userID + ") AS orders"
                     + " WHERE id=" + splitedURI[3]);
             try {
@@ -78,7 +80,7 @@ public class OrderServlet extends HttpServlet {
                     order.setTotalPrice(rs1.getFloat("total_price"));
                     
                     List<ProductInAnOrder> productList = new ArrayList<>();
-                    ResultSet rs2 = dbUtil.executeQuery("SELECT * FROM products_in_the_orders WHERE order_id=" + splitedURI[3]);
+                    ResultSet rs2 = dbUtilAutoTransaction.executeQuery("SELECT * FROM products_in_the_orders WHERE order_id=" + splitedURI[3]);
                     while (rs2.next()) {
                         ProductInAnOrder product = new ProductInAnOrder();
                         product.setProductID(rs2.getLong("product_id"));
@@ -107,7 +109,7 @@ public class OrderServlet extends HttpServlet {
         }
         else {
             // The request is not asking for a specific order, return the list of all orders of this user
-            ResultSet rs1 = dbUtil.executeQuery("SELECT * FROM orders WHERE user_id=" + userID);
+            ResultSet rs1 = dbUtilAutoTransaction.executeQuery("SELECT * FROM orders WHERE user_id=" + userID);
             List<Order> orderList = new ArrayList<>();
             try {
                 DbUtil dbUtil2 = new DbUtil();
@@ -191,12 +193,12 @@ public class OrderServlet extends HttpServlet {
         // Calculate the total price of the order
         int totalPrice = 0;
         // Insert data into database
-        dbUtil.executeUpdate("INSERT INTO orders (id, datetime, user_id) VALUES (" + orderID + ", '" + date + "', " + userID + ");");
+        dbUtilManualTransaction.executeUpdate("INSERT INTO orders (id, datetime, user_id) VALUES (" + orderID + ", '" + date + "', " + userID + ");");
         // NOTICE: the currently inserted data dose NOT include the total price
         
         // Save the products of this order
         for (ProductInAnOrder product: order.getProductList()) {
-            dbUtil.executeUpdate("INSERT INTO products_in_the_orders VALUES ("
+            dbUtilManualTransaction.executeUpdate("INSERT INTO products_in_the_orders VALUES ("
                     + orderID + ", "
                     + product.getProductID() + ", "
                     + product.getProductPrice() + ", "
@@ -206,12 +208,17 @@ public class OrderServlet extends HttpServlet {
         }
         
         // Update the total price in the order
-        dbUtil.executeUpdate("UPDATE orders SET total_price=" + totalPrice + " WHERE id=" + orderID);
+        dbUtilManualTransaction.executeUpdate("UPDATE orders SET total_price=" + totalPrice + " WHERE id=" + orderID);
+        
+        dbUtilManualTransaction.commit();
+        
+        response.setStatus(HttpServletResponse.SC_CREATED);
     }
 
     @Override
     public void destroy() {
-        dbUtil.close();
+        dbUtilAutoTransaction.close();
+        dbUtilManualTransaction.close();
     }
 
 }
