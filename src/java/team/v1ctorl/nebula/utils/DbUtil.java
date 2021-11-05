@@ -98,7 +98,7 @@ public class DbUtil {
         try {
             if (Kafka.ENABLE_KAFKA) {
                 PreparedStatement pstmt = conn.prepareStatement("INSERT INTO messages_to_send (`value`) VALUES (?);");
-                pstmt.setString(1, this.pstmt.toString());
+                pstmt.setString(1, new StringBuffer(this.pstmt.toString()).substring(43));
                 pstmt.executeUpdate();
             }
             return pstmt.executeUpdate();
