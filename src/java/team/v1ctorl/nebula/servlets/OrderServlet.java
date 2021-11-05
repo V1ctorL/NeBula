@@ -60,7 +60,7 @@ public class OrderServlet extends HttpServlet {
         }
         
         // Get the user's ID
-        String userID = (String) session.getAttribute("id");
+        Long userID = (Long) session.getAttribute("id");
         
         // Get the parameter in the URI
         String [] splitedURI = request.getRequestURI().split("/");
@@ -188,7 +188,7 @@ public class OrderServlet extends HttpServlet {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String date = simpleDateFormat.format(orderIDGeneratedDate);
         // Get the user's ID
-        String userID = (String) session.getAttribute("id");
+        Long userID = (Long) session.getAttribute("id");
         // Calculate the total price of the order
         float totalPrice = 0;
         

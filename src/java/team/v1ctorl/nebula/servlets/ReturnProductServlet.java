@@ -61,9 +61,6 @@ public class ReturnProductServlet extends HttpServlet {
             return;
         }
         
-        // Get the user's ID
-        String userID = (String) session.getAttribute("id");
-        
         // Get the parameter in the URI
         String [] splitedURI = request.getRequestURI().split("/");
         

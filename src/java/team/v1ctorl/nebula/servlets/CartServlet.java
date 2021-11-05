@@ -55,14 +55,14 @@ public class CartServlet extends HttpServlet {
         }
         
         // Load the cart for the user
-        String userID = (String) session.getAttribute("id");
+        Long userID = (Long) session.getAttribute("id");
         ResultSet rs = dbUtil.executeQuery("SELECT * FROM cart WHERE user_id=" + userID);
         List<Cart> cartList = new ArrayList<>();
         try {
             while (rs.next()) {
                 // Load data from ResultSet to a Java object.
                 Cart cart = new Cart();
-                cart.setUserID(Long.valueOf(userID));
+                cart.setUserID(userID);
                 cart.setProductID(rs.getLong("product_id"));
                 cart.setAmount(rs.getInt("amount"));
                 
@@ -118,7 +118,7 @@ public class CartServlet extends HttpServlet {
         }
         
         // Add a product in the cart of the user
-        String userID = (String) session.getAttribute("id");
+        Long userID = (Long) session.getAttribute("id");
         if (amount == null)
             dbUtil.executeUpdate("INSERT INTO cart (user_id, product_id) VALUES (" + userID + ", " + productID + ");");
         else

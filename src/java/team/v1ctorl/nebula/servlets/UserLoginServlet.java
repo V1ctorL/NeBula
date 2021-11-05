@@ -71,7 +71,7 @@ public class UserLoginServlet extends HttpServlet {
         try {
             if (rs.next() && BCrypt.checkpw(password, rs.getString("password"))) {
                 session = request.getSession();
-                session.setAttribute("id", rs.getString("id"));
+                session.setAttribute("id", rs.getLong("id"));
                 
                 out.println("approved");
             }
