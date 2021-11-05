@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import team.v1ctorl.nebula.Settings.Datebase;
+import team.v1ctorl.nebula.Settings.Kafka;
 import team.v1ctorl.nebula.exceptions.DbUtilException;
 
 /**
@@ -45,7 +46,7 @@ public class DbUtil {
             handleException(ex, "Fail to load jdbc driver.");
         }
     }
-    
+
     public void setAutoCommit(boolean autoCommit) {
         try {
             // If set false, a lock will be gotten, which MUST be released by setting it true after commit.
@@ -81,6 +82,11 @@ public class DbUtil {
     
     public int executeUpdate(String sql) {
         try {
+            if (Kafka.ENABLE_KAFKA) {
+                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO messages_to_send (`value`) VALUES (?);");
+                pstmt.setString(1, sql);
+                pstmt.executeUpdate();
+            }
             return stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             handleException(ex, "Met exception while executing update.");
@@ -90,6 +96,11 @@ public class DbUtil {
     
     public int executeUpdate() {
         try {
+            if (Kafka.ENABLE_KAFKA) {
+                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO messages_to_send (`value`) VALUES (?);");
+                pstmt.setString(1, this.pstmt.toString());
+                pstmt.executeUpdate();
+            }
             return pstmt.executeUpdate();
         } catch (SQLException ex) {
             handleException(ex, "Met exception while executing update.");
