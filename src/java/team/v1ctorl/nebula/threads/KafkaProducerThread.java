@@ -21,12 +21,14 @@ public class KafkaProducerThread extends Thread {
     @Override
     public void run() {
         Producer producer = Producer.getInstance();
-        DbUtil dbUtil = new DbUtil();
+        DbUtil dbUtil_1 = new DbUtil();
+        DbUtil dbUtil_2 = new DbUtil();
         while (true) {
-            ResultSet rs = dbUtil.executeQuery("SELECT * FROM messages_to_send;");
+            ResultSet rs = dbUtil_1.executeQuery("SELECT * FROM messages_to_send;");
             try {
                 while (rs.next()) {
                     producer.send("nebula", rs.getString("key"), rs.getString("value"));
+                    dbUtil_2.executeUpdate("DELETE FROM messages_to_send WHERE id=" + rs.getString("id"));
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(KafkaProducerThread.class.getName()).log(Level.SEVERE, null, ex);

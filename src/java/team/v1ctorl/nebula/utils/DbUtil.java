@@ -82,7 +82,7 @@ public class DbUtil {
     
     public int executeUpdate(String sql) {
         try {
-            if (Kafka.ENABLE_KAFKA) {
+            if (Kafka.ENABLE_KAFKA && !sql.startsWith("DELETE FROM messages_to_send")) {
                 PreparedStatement pstmt = conn.prepareStatement("INSERT INTO messages_to_send (`value`) VALUES (?);");
                 pstmt.setString(1, sql);
                 pstmt.executeUpdate();
