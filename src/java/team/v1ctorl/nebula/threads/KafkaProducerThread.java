@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import team.v1ctorl.nebula.Settings;
 import team.v1ctorl.nebula.utils.DbUtil;
 import team.v1ctorl.nebula.utils.KafkaUtil.Producer;
 
@@ -27,7 +28,7 @@ public class KafkaProducerThread extends Thread {
             ResultSet rs = dbUtil_1.executeQuery("SELECT * FROM messages_to_send;");
             try {
                 while (rs.next()) {
-                    producer.send("nebula", rs.getString("key"), rs.getString("value"));
+                    producer.send("nebula", Settings.Kafka.Consumer.GROUP_ID, rs.getString("value"));
                     dbUtil_2.executeUpdate("DELETE FROM messages_to_send WHERE id=" + rs.getString("id"));
                 }
             } catch (SQLException ex) {
