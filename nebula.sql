@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 05/11/2021 17:12:48
+ Date: 05/11/2021 21:10:20
 */
 
 SET NAMES utf8mb4;
@@ -37,7 +37,6 @@ CREATE TABLE `cart`  (
 DROP TABLE IF EXISTS `messages_to_send`;
 CREATE TABLE `messages_to_send`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `key` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `value` mediumtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
