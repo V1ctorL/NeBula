@@ -23,7 +23,7 @@ public class Settings {
     public class Kafka {
         public static final boolean ENABLE_KAFKA = true;
         
-        public static final String BOOTSTRAP_SERVERS = "192.168.137.117:9092";
+        public static final String BOOTSTRAP_SERVERS = "192.168.137.108:9092";
         
         public class Producer {
             public static final String ACKS                     =   "all";
