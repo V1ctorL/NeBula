@@ -7,6 +7,7 @@ package team.v1ctorl.nebula.listeners;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import team.v1ctorl.nebula.Settings.Kafka;
 import team.v1ctorl.nebula.threads.KafkaConsumerThread;
 import team.v1ctorl.nebula.threads.KafkaProducerThread;
 
@@ -21,14 +22,16 @@ public class KafkaListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        if (kafkaConsumerThread == null) {
-            kafkaConsumerThread = new KafkaConsumerThread();
-            kafkaConsumerThread.start();
-        }
-        
-        if (kafkaProducerThread == null) {
-            kafkaProducerThread = new KafkaProducerThread();
-            kafkaProducerThread.start();
+        if (Kafka.ENABLE_KAFKA) {
+            if (kafkaConsumerThread == null) {
+                kafkaConsumerThread = new KafkaConsumerThread();
+                kafkaConsumerThread.start();
+            }
+
+            if (kafkaProducerThread == null) {
+                kafkaProducerThread = new KafkaProducerThread();
+                kafkaProducerThread.start();
+            }
         }
     }
 
