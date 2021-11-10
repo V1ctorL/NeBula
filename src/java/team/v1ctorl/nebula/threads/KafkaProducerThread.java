@@ -21,6 +21,7 @@ public class KafkaProducerThread extends Thread {
 
     @Override
     public void run() {
+        System.out.println("Running KafkaProducerThread");
         Producer producer = Producer.getInstance();
         DbUtil dbUtil_1 = new DbUtil();
         DbUtil dbUtil_2 = new DbUtil();
