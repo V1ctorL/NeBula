@@ -10,25 +10,35 @@ There are also a [web client](https://github.com/V1ctorL/NeBulaWebClient) and a 
 
 ## Install
 
-You can get each part of the code via the related statements.
+You can get each part of the code via the related commends.
 
 **The Backend Services**
 
-```
+```shell
 git clone git@github.com:V1ctorL/NeBula.git
 ```
 
 **The Web Client**
 
-```
+```shell
 git clone git@github.com:V1ctorL/NeBulaWebClient.git
 ```
 
 **The Starter**
 
-```
+```shell
 git clone git@github.com:V1ctorL/NeBulaStarter.git
 ```
+
+For this backend project, the database should also be imported. The `.sql` file is provided, you can run the following commends in the MySQL Commend Line Client.
+
+```mysql
+CREATE DATABASE NeBula DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+USE NeBula;
+SOURCE path/to/nebula.sql
+```
+
+If error occurs, you can re-run the last line of the commends, and then it should be ok.
 
 ## Usage
 
@@ -41,7 +51,7 @@ A setting file is provided, whose location is `/src/java/team/v1ctorl/nebula/Set
 The backend interfaces are designed in the RESTful way, and thus some operations are NOT recommended, such as sending user information as parameters in the URL, although it is surely convenient for programmers to do so while developing and testing.
 
 ```
-https://localhost:8080/NeBula/login?username=example_name&password=example_password
+https://localhost:8181/NeBula/login?username=example_name&password=example_password
 ```
 
 If you really want to do so, you can enable it by switching the field `DEVELOPER_MODE` from `false` (the default one) to `true` (again, it is not recommended, especially in production environments).
@@ -50,13 +60,13 @@ If you really want to do so, you can enable it by switching the field `DEVELOPER
 
 The default setting is using MySQL with version above 8.0, hence the driver is set to be
 
-```
+```java
 com.mysql.cj.jdbc.Driver
 ```
 
 If you are using MySQL with version below 8.0, you should change it to be
 
-```
+```java
 com.mysql.jdbc.Driver
 ```
 
@@ -77,6 +87,24 @@ If you have your own Kafka servers, remember to fill your server IPs with ports 
 If you are deploying this project on multiple machines, remember to number them and set it in the `Consumer.GROUP_ID` field. Each instance of the backend server is designed to be both producer and consumer, and this field is used to identify whether a Kafka event is produced by a consumer itself.
 
 You can also customize and edit other Kafka setting as you wish.
+
+### HTTPS
+
+HTTPS is enabled. However, in this case, you may have to deal with extra settings in the server, such as GlassFish (designated for this coursework) or Tomcat. If you just want to work with HTTP only, you can remove the label `<security-constraint>` together with its children labels and their contents in the file `web.xml`. All the codes that enables HTTPS and can be removed are shown as follows.
+
+```xml
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>*</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+```
+
+
 
 ## Dependencies
 
